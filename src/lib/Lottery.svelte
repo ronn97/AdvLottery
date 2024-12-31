@@ -11,16 +11,16 @@
     /*抽奖步骤*/
     let status = ["抽奖", "停！", "继续"];
     let prizes = [
-            {
-                name: "TBox 茶合",
-                prize: "三等奖 ",
-                level: 3,
-                url: "img/prize/a11.png",
-                person: "",
-            },
-        ],
-        position: 0 /*正在抽第几个奖*/,
-        showResult: boolean = false; /*是否展示抽奖信息*/
+        {
+            name: "TBox 茶合",
+            prize: "三等奖 ",
+            level: 3,
+            url: "img/prize/a11.png",
+            person: "",
+        },
+    ];
+    let position = 0; /*正在抽第几个奖*/
+    let showResult: boolean = false; /*是否展示抽奖信息*/
 
     // 定义用户数据的类型
     interface UserItem {
@@ -182,6 +182,9 @@
                 addMask();
                 let level = "";
 
+                console.log("当前奖品等级：", prizes);
+                console.log("当前奖品等级：", position);
+                console.log("当前奖品等级：", level);
                 /*判断当前的奖品等级*/
                 switch (prizes[position].level) {
                     case 1:
@@ -197,7 +200,7 @@
                 }
 
                 /*中奖信息*/
-                prizes[position].person = ret[0];
+                prizes[position].person = ret[0].name;
 
                 /*重新加载人员名单*/
                 /*移除词云*/
@@ -212,7 +215,7 @@
                 createCanvas();
 
                 /*记录中奖时间和名单到本地*/
-                localStorage.setItem(new Date().toString(), ret[0]);
+                localStorage.setItem(new Date().toString(), ret[0].name);
             }
 
             running = 2;
@@ -319,6 +322,24 @@
     >
 </div>
 
+<!--展示页面-->
+{#if running == 2}
+    <div id="result" class="result">
+        {#if !showResult}
+            <div class="display">
+                <!--输出抽奖结果-->
+                <img src={prizes[position].url} />
+                <div class="down">
+                    <div class="item1">
+                        {prizes[position].prize + " " + prizes[position].name}
+                    </div>
+                    <div class="item2">{prizes[position].person}</div>
+                </div>
+            </div>
+        {/if}
+    </div>
+{/if}
+
 <style lang="scss">
     .wall {
         width: 100%;
@@ -326,7 +347,7 @@
         height: 100%;
         box-sizing: border-box;
         margin: 0;
-        background-image: url("@/assets/wall.jpg");
+        background-image: url("@/assets/img/wall.jpg");
         overflow: hidden;
         background-color: #121936;
         background-size: 100% 100%;
@@ -340,16 +361,38 @@
         right: 20px;
         text-align: center;
         .pure-button {
+            zoom: 1;
+            line-height: normal;
+            white-space: nowrap;
+            vertical-align: middle;
+            text-align: center;
+            cursor: pointer;
+            -webkit-user-drag: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            -webkit-box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            box-sizing: border-box;
+            font-family: inherit;
+            font-size: 100%;
+            padding: 0.5em 1em;
+            color: rgba(0, 0, 0, 0.8);
+            border: unset;
+            background-color: #e6e6e6;
+            text-decoration: none;
+            border-radius: 2px;
+            position: relative;
+            z-index: 9999;
             display: inline-block;
             margin: 5px;
             padding: 10px 0;
             text-align: center;
             width: 50px;
-            border: unset;
-            outline: unset;
 
             &:focus {
-                // opacity: 0.85;
+                outline: 0;
             }
 
             &.button-success,
@@ -375,6 +418,117 @@
 
             &.button-secondary {
                 background: rgb(66, 184, 221);
+            }
+        }
+    }
+
+    /*显示抽奖结果的样式*/
+    .result {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: rgba(92, 92, 92, 0.25);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        background-image: url("@/assets/img/alert.png");
+        background-size: 50%;
+        background-repeat: no-repeat;
+        background-position: center;
+        .display {
+            width: 50%;
+            height: 50%;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            align-content: center;
+            flex-wrap: wrap;
+            img {
+                width: 25%;
+                margin-top: 20%;
+                margin-left: 39.5%;
+                margin-right: 40.5%;
+            }
+
+            .down {
+                margin-top: 3%;
+                margin-right: 0.5%;
+                .item1 {
+                    text-align: center;
+                    font-size: 25px;
+                    font-weight: bold;
+                }
+                .item2 {
+                    font-size: 25px;
+                    margin-top: 20px;
+                    font-weight: bold;
+                    color: #fff100;
+                    background-color: red;
+                    padding: 10px 18px;
+                    border-radius: 10px;
+                    text-align: center;
+                }
+            }
+        }
+    }
+
+    /*显示抽奖结果的样式*/
+    .result2 {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-image: url("@/assets/img/alert2.png");
+        background-size: 100% 100%;
+        background-repeat: no-repeat;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        .list {
+            width: 85vw;
+            height: 70vh;
+            margin-top: 20vh;
+            display: flex;
+            ul {
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                align-content: center;
+                justify-content: space-between;
+                li {
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    flex-wrap: wrap;
+                    margin: 20px 10px;
+                    background-image: url("@/assets/img/bg.png");
+                    background-size: 100% 100%;
+                    img {
+                        width: 50%;
+                        margin: 10px 25%;
+                    }
+                    .title {
+                        width: 100%;
+                        margin-top: 15px;
+                        color: #a90808;
+                        font-size: 28px;
+                    }
+
+                    .footer {
+                        width: 80%;
+                        background-image: url("@/assets/img/bg2.png");
+                        margin-bottom: 0;
+                        background-size: 100% 100%;
+                        color: #ffffff;
+                        font-size: 25px;
+                        padding: 3px;
+                    }
+                }
             }
         }
     }

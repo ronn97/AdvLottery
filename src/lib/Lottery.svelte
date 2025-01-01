@@ -2,27 +2,23 @@
     import {onMount, onDestroy} from "svelte";
     import "@/assets/js/tagcanvas.js";
     import {member} from "@/assets/js/member.js";
-
-    /*默认的抽奖人数*/
-    let selected = 1;
+    import {
+        prizeListStore,
+        selectedPersonStore,
+        prizeStoreMethods,
+        progressStoreMethods,
+        progressNumberStore
+    } from "@/store/prize";
+    
     /*是否正在抽奖*/
     let running = 0;
     let fullState = "全屏";
     /*抽奖步骤*/
     let status = ["抽奖", "停！", "继续"];
-    let prizes = [
-        {
-            name: "TBox 茶合", //奖品名称
-            prize: "三等奖 ",
-            level: 3, //奖品等级
-            url: "img/prize/a11.png", //奖品
-            person: "",//中奖人
-        },
-    ];
-    let position = 0; /*正在抽第几个奖*/
+    // let prizeList = prizeStore.prizeList;
+    let prizeList = [], selectedPerson = [];
+    let progress = 0; /*正在抽第几个奖*/
     let showResult: boolean = false; /*是否展示抽奖信息*/
-
-    const prizesRverese = [...prizes];
 
     // 定义用户数据的类型
     interface UserItem {
@@ -37,8 +33,6 @@
         return [0.2, 0.08];
     };
 
-    let choosed;
-
     /*创建名单列表*/
     const createHTML = (self: any) => {
         /*创建词云列表*/
@@ -48,9 +42,9 @@
         userData.forEach(function (item: any, index: number) {
             item["index"] = index;
             /*如何已经被抽奖抽中了，显示黄色的名字*/
-            console.log(!choosed[item.name]);
+            console.log(!selectedPerson[item.name]);
 
-            if (!choosed[item.name]) {
+            if (!selectedPerson[item.name]) {
                 html.push('<li><a href="#">' + item.name + "</a></li>");
             }
         });
@@ -93,12 +87,19 @@
         }
     };
 
+    const calculateWidth = (person: number) => {
+        if (!person || person === 0) {
+            return '25%';
+        }
+        return `${person * 15}%`;
+    }
+
     const buildData = () => {
         member.forEach((item: any, index: number) => {
             userData.push({name: item, index: index});
         });
         /*清除抽奖记录*/
-        localStorage.clear();
+        // localStorage.clear();
 
         /*监控窗口大小变化，及时重绘canvas*/
         window.onresize = function () {
@@ -126,10 +127,6 @@
             /*将抽奖状态归0*/
             running = 0;
         };
-
-        /*从本地存储获取当前被选中过的人员名单*/
-        const choosedStr = localStorage.getItem("choosed");
-        choosed = choosedStr ? JSON.parse(choosedStr) : {};
     };
 
     const removeMask = () => {
@@ -149,10 +146,8 @@
     const lottery = (count: number): any[] => {
         const resUserData = userData
             /*过滤成员，如果没有在已被抽中的名单内，则返回该元素组成新数组*/
-            .filter(function (m, index) {
-                /*添加索引*/
-                m.index = index;
-                return !choosed[m.name];
+            .filter((m, index) => {
+                return !selectedPerson[m.name];
             }).map((m) => {
                 /*作为新元素*/
                 return {
@@ -167,16 +162,16 @@
             /*截取数组*/
             .slice(0, count);
         // 新增被抽中的人员名单
-        resUserData.forEach(function (m) {
-            choosed[m.name] = 1;
-        });
-        // 更新本地存储
-        localStorage.setItem('choosed', JSON.stringify(choosed));
+        // resUserData.forEach(function (m) {
+        //     choosed[m.name] = 1;
+        // });
+        // // 更新本地存储
+        // localStorage.setItem('choosed', JSON.stringify(choosed));
         return resUserData;
     };
 
     const handleOfToggle = () => {
-        if (position >= prizes.length) {
+        if (progress >= prizeList.length) {
             /*所有奖品抽完了，当前奖品等级0*/
             running = 0;
 
@@ -200,9 +195,10 @@
         if (running == 1) {
             /*将词云的速度转换为正常速度*/
             (window as any).TagCanvas.SetSpeed("myCanvas", speed());
-
+            //获取当前奖品数量
+            const positionNum = prizeList[progress].number;
             /*随机生成抽奖名单*/
-            let ret = lottery(selected);
+            let ret = lottery(positionNum);
             // let ret = userData;
 
             /*如果所有人都被抽中了，提示无可抽奖人员*/
@@ -212,28 +208,10 @@
                 return;
             } else {
                 addMask();
-                let level = "";
-
-                console.log("当前奖品等级：", prizes);
-                console.log("当前奖品等级：", position);
-                console.log("当前奖品等级：", level);
-                /*判断当前的奖品等级*/
-                switch (prizes[position].level) {
-                    case 1:
-                        level = "一等奖";
-                        break;
-                    case 2:
-                        level = "二等奖";
-                        break;
-                    case 3:
-                        level = "三等奖";
-                        break;
-                    default:
-                }
-
                 /*中奖信息*/
-                prizes[position].person = ret[0].name;
-
+                prizeList[progress].person = ret.map((item: any) => {
+                    return item.name;
+                })
                 /*重新加载人员名单*/
                 /*移除词云*/
                 const canvasElement = document.getElementById("myCanvas");
@@ -246,12 +224,11 @@
                 /*重新创建词云*/
                 createCanvas();
 
-                /*记录中奖时间和名单到本地*/
-                localStorage.setItem(new Date().toString(), ret[0].name);
+                /*奖品名单记录到本地*/
+                prizeStoreMethods.setPrizeList(prizeList)
             }
 
             running = 2;
-
             /*进入中奖结果公式状态*/
         } else if (running == 2) {
             /*隐藏滤镜*/
@@ -260,7 +237,9 @@
             /*进入待抽奖的状态*/
             running = 0;
 
-            position++; //下一个待抽奖品
+            progress += 1;
+            progressStoreMethods.setProgress(progress)
+            // progress++; //下一个待抽奖品
         } else {
             /*加快词云的旋转速度*/
             (window as any).TagCanvas.SetSpeed("myCanvas", [5, 1]);
@@ -316,11 +295,25 @@
 
         const isConfirm = confirm("确定要重置么？所有之前的抽奖历史将被清除！");
         if (isConfirm) {
-            location.reload();
+            prizeStoreMethods.initPrizeList();
+            progressStoreMethods.initProgress();
         }
     };
 
     onMount(() => {
+        prizeListStore.subscribe(value => {
+            prizeList = value;
+            console.log("Updated prizeList:", prizeList); // 调试信息
+        });
+        selectedPersonStore.subscribe(value => {
+            selectedPerson = value;
+            console.log("Updated selectedPerson:", selectedPerson);
+        })
+        progressNumberStore.subscribe(value => {
+            progress = value;
+            console.log("Updated progress:", progress);
+        })
+
         buildData();
         createCanvas();
     });
@@ -364,12 +357,12 @@
         {#if !showResult}
             <div class="display">
                 <!--输出抽奖结果-->
-                <img src={prizes[position].url}/>
+                <img src={prizeList[progress].url}/>
                 <div class="down">
                     <div class="item1">
-                        {prizes[position].prize + " " + prizes[position].name}
+                        {prizeList[progress].label + " " + prizeList[progress].name}
                     </div>
-                    <div class="item2">{prizes[position].person}</div>
+                    <div class="item2">{prizeList[progress].person}</div>
                 </div>
             </div>
         {/if}
@@ -381,11 +374,12 @@
         <div class="list">
             <!--循环输出结果-->
             <ul>
-                {#each prizesRverese as item, index}
-                    <li key={index}>
+                {#each prizeList as item, index}
+                    <li key={index}
+                        style="width: {calculateWidth(item.person?.length)}">
                         <div class="title">{item.name}</div>
                         <img src={item.url}>
-                        <div class="footer">{item.person == "" ? item.prize : item.person}</div>
+                        <div class="footer">{item.person?.length ? item.person : item.label }</div>
                     </li>
                 {/each}
             </ul>
@@ -560,7 +554,10 @@
         flex-wrap: wrap;
         align-items: center;
         align-content: center;
-        justify-content: space-between;
+        justify-content: center;
+        width: 100%;
+        padding: 0;
+        margin: 0;
 
         li {
           display: flex;
@@ -573,7 +570,8 @@
           text-align: center;
 
           img {
-            width: 50%;
+            //width: 50%;
+            height: 140px;
             margin: 10px 25%;
           }
 

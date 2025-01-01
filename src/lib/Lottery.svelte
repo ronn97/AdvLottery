@@ -9,7 +9,7 @@
         progressStoreMethods,
         progressNumberStore
     } from "@/store/prize";
-    
+
     /*是否正在抽奖*/
     let running = 0;
     let fullState = "全屏";
@@ -357,7 +357,7 @@
         {#if !showResult}
             <div class="display">
                 <!--输出抽奖结果-->
-                <img src={prizeList[progress].url}/>
+                <img src={prizeList[progress].url} alt={prizeList[progress].label + " " + prizeList[progress].name}/>
                 <div class="down">
                     <div class="item1">
                         {prizeList[progress].label + " " + prizeList[progress].name}
@@ -378,7 +378,7 @@
                     <li key={index}
                         style="width: {calculateWidth(item.person?.length)}">
                         <div class="title">{item.name}</div>
-                        <img src={item.url}>
+                        <img src={item.url} alt={item.name}/>
                         <div class="footer">{item.person?.length ? item.person : item.label }</div>
                     </li>
                 {/each}

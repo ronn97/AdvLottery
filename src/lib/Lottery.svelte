@@ -1,7 +1,7 @@
 <script lang="ts">
-    import { onMount, onDestroy } from "svelte";
+    import {onMount, onDestroy} from "svelte";
     import "@/assets/js/tagcanvas.js";
-    import { member } from "@/assets/js/member.js";
+    import {member} from "@/assets/js/member.js";
 
     /*默认的抽奖人数*/
     let selected = 1;
@@ -12,15 +12,17 @@
     let status = ["抽奖", "停！", "继续"];
     let prizes = [
         {
-            name: "TBox 茶合",
+            name: "TBox 茶合", //奖品名称
             prize: "三等奖 ",
-            level: 3,
-            url: "img/prize/a11.png",
-            person: "",
+            level: 3, //奖品等级
+            url: "img/prize/a11.png", //奖品
+            person: "",//中奖人
         },
     ];
     let position = 0; /*正在抽第几个奖*/
     let showResult: boolean = false; /*是否展示抽奖信息*/
+
+    const prizesRverese = [...prizes];
 
     // 定义用户数据的类型
     interface UserItem {
@@ -35,10 +37,7 @@
         return [0.2, 0.08];
     };
 
-    /*从本地存储获取当前被选中过的人员名单*/
-    const choosedStr = localStorage.getItem("choosed");
-    var choosed = choosedStr ? JSON.parse(choosedStr) : {};
-    // var choosed = JSON.parse(localStorage.getItem("choosed")) || {};
+    let choosed;
 
     /*创建名单列表*/
     const createHTML = (self: any) => {
@@ -96,7 +95,7 @@
 
     const buildData = () => {
         member.forEach((item: any, index: number) => {
-            userData.push({ name: item, index: index });
+            userData.push({name: item, index: index});
         });
         /*清除抽奖记录*/
         localStorage.clear();
@@ -127,6 +126,10 @@
             /*将抽奖状态归0*/
             running = 0;
         };
+
+        /*从本地存储获取当前被选中过的人员名单*/
+        const choosedStr = localStorage.getItem("choosed");
+        choosed = choosedStr ? JSON.parse(choosedStr) : {};
     };
 
     const removeMask = () => {
@@ -141,6 +144,35 @@
         if (mainElement) {
             mainElement.classList.add("mask");
         }
+    };
+
+    const lottery = (count: number): any[] => {
+        const resUserData = userData
+            /*过滤成员，如果没有在已被抽中的名单内，则返回该元素组成新数组*/
+            .filter(function (m, index) {
+                /*添加索引*/
+                m.index = index;
+                return !choosed[m.name];
+            }).map((m) => {
+                /*作为新元素*/
+                return {
+                    ...m,
+                    score: Math.random()
+                };
+            })
+            /*排序*/
+            .sort(function (a, b) {
+                return a.score - b.score;
+            })
+            /*截取数组*/
+            .slice(0, count);
+        // 新增被抽中的人员名单
+        resUserData.forEach(function (m) {
+            choosed[m.name] = 1;
+        });
+        // 更新本地存储
+        localStorage.setItem('choosed', JSON.stringify(choosed));
+        return resUserData;
     };
 
     const handleOfToggle = () => {
@@ -170,11 +202,11 @@
             (window as any).TagCanvas.SetSpeed("myCanvas", speed());
 
             /*随机生成抽奖名单*/
-            // var ret = lottery(selected);
-            let ret = userData;
+            let ret = lottery(selected);
+            // let ret = userData;
 
             /*如果所有人都被抽中了，提示无可抽奖人员*/
-            if (ret.length === 0) {
+            if (ret?.length == 0) {
                 alert("所有人都中奖了！");
                 running = 0;
                 return;
@@ -272,6 +304,8 @@
 
         /*改变显示的状态*/
         showResult = !showResult;
+
+        console.log("showResult", showResult);
     };
 
     const handleOfReset = () => {
@@ -301,24 +335,26 @@
 <!--显示右下角的工具按钮-->
 <div class="tools">
     <button
-        on:click={handleOfToggle}
-        class="pure-button"
-        class:button-error={running !== 1}
-        class:button-secondary={running === 1}
+            on:click={handleOfToggle}
+            class="pure-button"
+            class:button-error={running !== 1}
+            class:button-secondary={running === 1}
     >
         {showResult ? "继续" : status[running]}
     </button>
     <button class="pure-button button-success" on:click={handleOfFullScreen}
-        >{fullState}</button
+    >{fullState}</button
     >
     <!--显示抽奖结果-->
     <button class="pure-button button-secondary" on:click={handleOfShowList}
-        >结果</button
+    >结果
+    </button
     >
     <button
-        class="pure-button button-warning"
-        style="font-family: myfont;"
-        on:click={handleOfReset}>重置</button
+            class="pure-button button-warning"
+            style="font-family: myfont;"
+            on:click={handleOfReset}>重置
+    </button
     >
 </div>
 
@@ -328,7 +364,7 @@
         {#if !showResult}
             <div class="display">
                 <!--输出抽奖结果-->
-                <img src={prizes[position].url} />
+                <img src={prizes[position].url}/>
                 <div class="down">
                     <div class="item1">
                         {prizes[position].prize + " " + prizes[position].name}
@@ -339,197 +375,226 @@
         {/if}
     </div>
 {/if}
-
+<!--结果页面-->
+{#if showResult}
+    <div class="result2">
+        <div class="list">
+            <!--循环输出结果-->
+            <ul>
+                {#each prizesRverese as item, index}
+                    <li key={index}>
+                        <div class="title">{item.name}</div>
+                        <img src={item.url}>
+                        <div class="footer">{item.person == "" ? item.prize : item.person}</div>
+                    </li>
+                {/each}
+            </ul>
+        </div>
+    </div>
+{/if}
 <style lang="scss">
-    .wall {
-        width: 100%;
-        min-width: 1200px;
-        height: 100%;
-        box-sizing: border-box;
-        margin: 0;
-        background-image: url("@/assets/img/wall.jpg");
-        overflow: hidden;
-        background-color: #121936;
-        background-size: 100% 100%;
-        background-position: center center;
-        background-repeat: no-repeat;
+  .wall {
+    width: 100%;
+    min-width: 1200px;
+    height: 100%;
+    box-sizing: border-box;
+    margin: 0;
+    background-image: url("@/assets/img/wall.jpg");
+    overflow: hidden;
+    background-color: #121936;
+    background-size: 100% 100%;
+    background-position: center center;
+    background-repeat: no-repeat;
+  }
+
+  .tools {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    text-align: center;
+
+    .pure-button {
+      zoom: 1;
+      line-height: normal;
+      white-space: nowrap;
+      vertical-align: middle;
+      text-align: center;
+      cursor: pointer;
+      -webkit-user-drag: none;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+      -webkit-box-sizing: border-box;
+      -moz-box-sizing: border-box;
+      box-sizing: border-box;
+      font-family: inherit;
+      font-size: 100%;
+      padding: 0.5em 1em;
+      color: rgba(0, 0, 0, 0.8);
+      border: unset;
+      background-color: #e6e6e6;
+      text-decoration: none;
+      border-radius: 2px;
+      position: relative;
+      z-index: 9999;
+      display: inline-block;
+      margin: 5px;
+      padding: 10px 0;
+      text-align: center;
+      width: 50px;
+
+      &:focus {
+        outline: 0;
+      }
+
+      &.button-success,
+      &.button-error,
+      &.button-warning,
+      &.button-secondary {
+        color: white;
+        border-radius: 4px;
+        text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+      }
+
+      &.button-success {
+        background: rgb(28, 184, 65);
+      }
+
+      &.button-error {
+        background: rgb(202, 60, 60);
+      }
+
+      &.button-warning {
+        background: rgb(223, 117, 20);
+      }
+
+      &.button-secondary {
+        background: rgb(66, 184, 221);
+      }
     }
+  }
 
-    .tools {
-        position: absolute;
-        bottom: 20px;
-        right: 20px;
-        text-align: center;
-        .pure-button {
-            zoom: 1;
-            line-height: normal;
-            white-space: nowrap;
-            vertical-align: middle;
-            text-align: center;
-            cursor: pointer;
-            -webkit-user-drag: none;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-            -webkit-box-sizing: border-box;
-            -moz-box-sizing: border-box;
-            box-sizing: border-box;
-            font-family: inherit;
-            font-size: 100%;
-            padding: 0.5em 1em;
-            color: rgba(0, 0, 0, 0.8);
-            border: unset;
-            background-color: #e6e6e6;
-            text-decoration: none;
-            border-radius: 2px;
-            position: relative;
-            z-index: 9999;
-            display: inline-block;
-            margin: 5px;
-            padding: 10px 0;
-            text-align: center;
-            width: 50px;
+  /*显示抽奖结果的样式*/
+  .result {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(92, 92, 92, 0.25);
+    display: flex;
+    justify-content: center;
+    align-items: center;
 
-            &:focus {
-                outline: 0;
-            }
+    background-image: url("@/assets/img/alert.png");
+    background-size: 50%;
+    background-repeat: no-repeat;
+    background-position: center;
 
-            &.button-success,
-            &.button-error,
-            &.button-warning,
-            &.button-secondary {
-                color: white;
-                border-radius: 4px;
-                text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
-            }
+    .display {
+      width: 50%;
+      height: 50%;
 
-            &.button-success {
-                background: rgb(28, 184, 65);
-            }
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      align-content: center;
+      flex-wrap: wrap;
 
-            &.button-error {
-                background: rgb(202, 60, 60);
-            }
+      img {
+        width: 25%;
+        margin-top: 20%;
+        margin-left: 39.5%;
+        margin-right: 40.5%;
+      }
 
-            &.button-warning {
-                background: rgb(223, 117, 20);
-            }
+      .down {
+        margin-top: 3%;
+        margin-right: 0.5%;
 
-            &.button-secondary {
-                background: rgb(66, 184, 221);
-            }
+        .item1 {
+          text-align: center;
+          font-size: 25px;
+          font-weight: bold;
         }
+
+        .item2 {
+          font-size: 25px;
+          margin-top: 20px;
+          font-weight: bold;
+          color: #fff100;
+          background-color: red;
+          padding: 10px 18px;
+          border-radius: 10px;
+          text-align: center;
+        }
+      }
     }
+  }
 
-    /*显示抽奖结果的样式*/
-    .result {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        background-color: rgba(92, 92, 92, 0.25);
+  /*显示抽奖结果的样式*/
+  .result2 {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-image: url("@/assets/img/alert2.png");
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .list {
+      width: 85vw;
+      height: 70vh;
+      margin-top: 20vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      ul {
         display: flex;
-        justify-content: center;
+        flex-wrap: wrap;
         align-items: center;
+        align-content: center;
+        justify-content: space-between;
 
-        background-image: url("@/assets/img/alert.png");
-        background-size: 50%;
-        background-repeat: no-repeat;
-        background-position: center;
-        .display {
+        li {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          flex-wrap: wrap;
+          margin: 20px 10px;
+          background-image: url("@/assets/img/bg.png");
+          background-size: 100% 100%;
+          text-align: center;
+
+          img {
             width: 50%;
-            height: 50%;
+            margin: 10px 25%;
+          }
 
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            align-content: center;
-            flex-wrap: wrap;
-            img {
-                width: 25%;
-                margin-top: 20%;
-                margin-left: 39.5%;
-                margin-right: 40.5%;
-            }
+          .title {
+            width: 100%;
+            margin-top: 15px;
+            color: #a90808;
+            font-size: 28px;
+          }
 
-            .down {
-                margin-top: 3%;
-                margin-right: 0.5%;
-                .item1 {
-                    text-align: center;
-                    font-size: 25px;
-                    font-weight: bold;
-                }
-                .item2 {
-                    font-size: 25px;
-                    margin-top: 20px;
-                    font-weight: bold;
-                    color: #fff100;
-                    background-color: red;
-                    padding: 10px 18px;
-                    border-radius: 10px;
-                    text-align: center;
-                }
-            }
+          .footer {
+            width: 80%;
+            background-image: url("@/assets/img/bg2.png");
+            margin-bottom: 0;
+            background-size: 100% 100%;
+            color: #ffffff;
+            font-size: 25px;
+            padding: 3px;
+          }
         }
+      }
     }
-
-    /*显示抽奖结果的样式*/
-    .result2 {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        background-image: url("@/assets/img/alert2.png");
-        background-size: 100% 100%;
-        background-repeat: no-repeat;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        .list {
-            width: 85vw;
-            height: 70vh;
-            margin-top: 20vh;
-            display: flex;
-            ul {
-                display: flex;
-                flex-wrap: wrap;
-                align-items: center;
-                align-content: center;
-                justify-content: space-between;
-                li {
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    flex-wrap: wrap;
-                    margin: 20px 10px;
-                    background-image: url("@/assets/img/bg.png");
-                    background-size: 100% 100%;
-                    img {
-                        width: 50%;
-                        margin: 10px 25%;
-                    }
-                    .title {
-                        width: 100%;
-                        margin-top: 15px;
-                        color: #a90808;
-                        font-size: 28px;
-                    }
-
-                    .footer {
-                        width: 80%;
-                        background-image: url("@/assets/img/bg2.png");
-                        margin-bottom: 0;
-                        background-size: 100% 100%;
-                        color: #ffffff;
-                        font-size: 25px;
-                        padding: 3px;
-                    }
-                }
-            }
-        }
-    }
+  }
 </style>

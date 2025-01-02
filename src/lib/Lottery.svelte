@@ -337,16 +337,21 @@
     >
         {showResult ? "继续" : status[running]}
     </button>
-    <button class="pure-button button-success" on:click={handleOfFullScreen}
-        >{fullState}</button
+    <button
+        class="pure-button button-success"
+        disabled={running == 1}
+        on:click={handleOfFullScreen}>{fullState}</button
     >
     <!--显示抽奖结果-->
-    <button class="pure-button button-secondary" on:click={handleOfShowList}
+    <button
+        class="pure-button button-secondary"
+        disabled={running == 1}
+        on:click={handleOfShowList}
         >结果
     </button>
     <button
         class="pure-button button-warning"
-        style="font-family: myfont;"
+        disabled={running == 1}
         on:click={handleOfReset}
         >重置
     </button>
@@ -478,6 +483,11 @@
 
             &.button-secondary {
                 background: rgb(66, 184, 221);
+            }
+
+            &:disabled {
+                background: #ccc;
+                opacity: 0.85;
             }
         }
     }

@@ -325,87 +325,108 @@
     });
 </script>
 
-<header></header>
-<div class="wall" id="main"></div>
+<header><div class="boxWrap">上海灵擎网络-抽奖系统</div></header>
+<div class="bodyBox">
+    <div class="wall" id="main"></div>
 
-<!--显示右下角的工具按钮-->
-<div class="tools">
-    <button
-        on:click={handleOfToggle}
-        class="pure-button"
-        class:button-error={running !== 1}
-        class:button-secondary={running === 1}
-    >
-        {showResult ? "继续" : status[running]}
-    </button>
-    <button
-        class="pure-button button-success"
-        disabled={running == 1}
-        on:click={handleOfFullScreen}>{fullState}</button
-    >
-    <!--显示抽奖结果-->
-    <button
-        class="pure-button button-secondary"
-        disabled={running == 1}
-        on:click={handleOfShowList}
-        >结果
-    </button>
-    <button
-        class="pure-button button-warning"
-        disabled={running == 1}
-        on:click={handleOfReset}
-        >重置
-    </button>
-</div>
+    <!--显示右下角的工具按钮-->
+    <div class="tools">
+        <button
+            on:click={handleOfToggle}
+            class="pure-button"
+            class:button-error={running !== 1}
+            class:button-secondary={running === 1}
+        >
+            {showResult ? "继续" : status[running]}
+        </button>
+        <button
+            class="pure-button button-success"
+            disabled={running == 1}
+            on:click={handleOfFullScreen}>{fullState}</button
+        >
+        <!--显示抽奖结果-->
+        <button
+            class="pure-button button-secondary"
+            disabled={running == 1}
+            on:click={handleOfShowList}
+            >结果
+        </button>
+        <button
+            class="pure-button button-warning"
+            disabled={running == 1}
+            on:click={handleOfReset}
+            >重置
+        </button>
+    </div>
 
-<!--展示页面-->
-{#if running == 2}
-    <div id="result" class="result">
-        {#if !showResult}
-            <div class="display">
-                <!--输出抽奖结果-->
-                <img
-                    src={prizeList[progress].url}
-                    alt={prizeList[progress].label +
-                        " " +
-                        prizeList[progress].name}
-                />
-                <div class="down">
-                    <div class="item1">
-                        {prizeList[progress].label +
+    <!--展示页面-->
+    {#if running == 2}
+        <div id="result" class="result">
+            {#if !showResult}
+                <div class="display">
+                    <!--输出抽奖结果-->
+                    <img
+                        src={prizeList[progress].url}
+                        alt={prizeList[progress].label +
                             " " +
                             prizeList[progress].name}
-                    </div>
-                    <div class="item2">{prizeList[progress].person}</div>
-                </div>
-            </div>
-        {/if}
-    </div>
-{/if}
-<!--结果页面-->
-{#if showResult}
-    <div class="result2">
-        <div class="list">
-            <!--循环输出结果-->
-            <ul>
-                {#each prizeList as item, index}
-                    <li
-                        key={index}
-                        style="width: {calculateWidth(item.person?.length)}"
-                    >
-                        <div class="title">{item.name}</div>
-                        <img src={item.url} alt={item.name} />
-                        <div class="footer">
-                            {item.person?.length ? item.person : item.label}
+                    />
+                    <div class="down">
+                        <div class="item1">
+                            {prizeList[progress].label +
+                                " " +
+                                prizeList[progress].name}
                         </div>
-                    </li>
-                {/each}
-            </ul>
+                        <div class="item2">{prizeList[progress].person}</div>
+                    </div>
+                </div>
+            {/if}
         </div>
-    </div>
-{/if}
+    {/if}
+    <!--结果页面-->
+    {#if showResult}
+        <div class="result2">
+            <div class="list">
+                <!--循环输出结果-->
+                <ul>
+                    {#each prizeList as item, index}
+                        <li
+                            key={index}
+                            style="width: {calculateWidth(item.person?.length)}"
+                        >
+                            <div class="title">{item.name}</div>
+                            <img src={item.url} alt={item.name} />
+                            <div class="footer">
+                                {item.person?.length ? item.person : item.label}
+                            </div>
+                        </li>
+                    {/each}
+                </ul>
+            </div>
+        </div>
+    {/if}
+</div>
 
-<style lang="scss">
+<style scoped lang="scss">
+    header {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 50px;
+        width: 100%;
+        background-color: rgba(0, 0, 0, 0.8);
+        z-index: 9999;
+        color: #fff;
+        .boxWrap {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    }
+
     .wall {
         width: 100%;
         min-width: 1200px;

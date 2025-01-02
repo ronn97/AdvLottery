@@ -2,7 +2,7 @@
   import Lottery from "./lib/Lottery.svelte";
 </script>
 
-<div id="root">
+<div id="app">
   <Lottery />
 </div>
 

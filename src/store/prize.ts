@@ -47,7 +47,7 @@ function saveToStorage<T>(key: string, value: T) {
     }
 }
 
-const prizeStore = writable<PrizeState[]>(loadFromStorage(prizeKey, initialState));
+const prizeStore = writable<PrizeState[]>(loadFromStorage(prizeKey, JSON.parse(JSON.stringify(initialState))));
 prizeStore.subscribe((value) => {
     saveToStorage(prizeKey, value);
 });
@@ -68,7 +68,7 @@ export const progressNumberStore = derived(progressStore, ($progressStore) => $p
 export const prizeStoreMethods = {
     subscribe: prizeStore.subscribe,
     setPrizeList: (list: PrizeState[]) => prizeStore.set(list),
-    initPrizeList: () => prizeStore.set(initialState),
+    initPrizeList: () => prizeStore.set(JSON.parse(JSON.stringify(initialState))),
 };
 
 export const progressStoreMethods = {

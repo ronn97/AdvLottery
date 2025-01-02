@@ -14,7 +14,7 @@
     let running = 0;
     let fullState = "全屏";
     /*抽奖步骤*/
-    let status = ["抽奖", "停！", "继续"];
+    let status = ["抽奖", "停!", "继续"];
     // let prizeList = prizeStore.prizeList;
     let prizeList = [],
         selectedPerson = [];
@@ -325,6 +325,7 @@
     });
 </script>
 
+<header></header>
 <div class="wall" id="main"></div>
 
 <!--显示右下角的工具按钮-->
@@ -426,47 +427,26 @@
         text-align: center;
 
         .pure-button {
-            zoom: 1;
-            line-height: normal;
-            white-space: nowrap;
-            vertical-align: middle;
             text-align: center;
             cursor: pointer;
-            -webkit-user-drag: none;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-            -webkit-box-sizing: border-box;
-            -moz-box-sizing: border-box;
-            box-sizing: border-box;
-            font-family: inherit;
-            font-size: 100%;
-            padding: 0.5em 1em;
-            color: rgba(0, 0, 0, 0.8);
-            border: unset;
+            color: white;
             background-color: #e6e6e6;
-            text-decoration: none;
-            border-radius: 2px;
+            border-radius: 4px;
             position: relative;
             z-index: 9999;
-            display: inline-block;
+            display: block;
             margin: 5px;
-            padding: 10px 0;
-            text-align: center;
-            width: 50px;
-
-            &:focus {
-                outline: 0;
-            }
+            font-size: 16px;
+            line-height: 40px;
+            padding: 0 1em;
+            min-width: 50px;
+            text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
 
             &.button-success,
             &.button-error,
             &.button-warning,
             &.button-secondary {
-                color: white;
-                border-radius: 4px;
-                text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+                width: 64px;
             }
 
             &.button-success {
@@ -488,6 +468,7 @@
             &:disabled {
                 background: #ccc;
                 opacity: 0.85;
+                cursor: no-drop;
             }
         }
     }

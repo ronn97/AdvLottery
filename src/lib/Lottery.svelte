@@ -306,7 +306,13 @@
     });
 </script>
 
-<header><div class="boxWrap">上海灵擎网络-抽奖系统</div></header>
+<header>
+    {#if running == 1}
+        <div class="boxWrap">{"正在抽取-" + prizeList[progress].label}</div>
+    {:else}
+        <div class="boxWrap">上海灵擎网络-抽奖系统</div>
+    {/if}
+</header>
 <div class="bodyBox">
     <div class="wall" id="main"></div>
 
@@ -502,7 +508,7 @@
 
             img {
                 width: 25%;
-                margin-top: 24%;
+                margin-top: 22%;
             }
 
             .down {

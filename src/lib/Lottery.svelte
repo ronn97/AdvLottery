@@ -317,6 +317,7 @@
             class="pure-button"
             class:button-error={running !== 1}
             class:button-secondary={running === 1}
+            disabled={progress >= prizeList.length}
         >
             {showResult ? "继续" : status[running]}
         </button>

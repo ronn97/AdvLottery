@@ -1,7 +1,6 @@
 html {
     color: #000;
     background: #f0f2f2;
-    overflow-y: auto;
     -webkit-text-size-adjust: 100%;
     -ms-text-size-adjust: 100%;
 }
@@ -251,6 +250,7 @@ body {
     #app {
         width: 100%;
         height: 100%;
+        overflow: hidden;
         position: relative;
     }
 }

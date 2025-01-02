@@ -14,7 +14,7 @@ const initialState: PrizeState[] = [
         label: "三等奖",
         url: "img/prize/a11.png",
         person: [],
-        number: 3,
+        number: 10,
     },
     {
         name: "美的电饭煲",

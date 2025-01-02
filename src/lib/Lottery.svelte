@@ -16,15 +16,15 @@
     /*抽奖步骤*/
     let status = ["抽奖", "停!", "继续"];
     // let prizeList = prizeStore.prizeList;
-    let prizeList = [],
-        selectedPerson = [];
+    let prizeList: any[] = [],
+        selectedPerson: string[] = [];
     let progress = 0; /*正在抽第几个奖*/
     let showResult: boolean = false; /*是否展示抽奖信息*/
 
     // 定义用户数据的类型
     interface UserItem {
         name: string;
-        index?: number;
+        index: number;
     }
 
     let userData: UserItem[] = [];
@@ -39,13 +39,10 @@
         /*创建词云列表*/
         var html = ["<ul>"];
         /*遍历存储好的人员名单*/
-        let max = userData.length;
         userData.forEach(function (item: any, index: number) {
             item["index"] = index;
             /*如何已经被抽奖抽中了，显示黄色的名字*/
-            console.log(!selectedPerson[item.name]);
-
-            if (!selectedPerson[item.name]) {
+            if (!selectedPerson.includes(item.name)) {
                 html.push('<li><a href="#">' + item.name + "</a></li>");
             }
         });
@@ -62,7 +59,6 @@
         canvas.width = document.body.offsetWidth;
         /*设置画布的高度*/
         canvas.height = document.body.offsetHeight;
-        /*将画布添加到网页渲染*/
         /*将画布添加到网页渲染*/
         const mainElement = document.getElementById("main");
         if (mainElement) {
@@ -88,6 +84,20 @@
         }
     };
 
+    // 重新创建画布
+    const reCreateCanvas = () => {
+        /*移除词云*/
+        const canvasElement = document.getElementById("myCanvas");
+        if (canvasElement) {
+            const parentElement = canvasElement.parentElement;
+            if (parentElement) {
+                parentElement.removeChild(canvasElement);
+            }
+        }
+
+        createCanvas();
+    };
+
     const calculateWidth = (person: number) => {
         if (!person || person === 0) {
             return "25%";
@@ -99,34 +109,21 @@
         member.forEach((item: any, index: number) => {
             userData.push({ name: item, index: index });
         });
-        /*清除抽奖记录*/
-        // localStorage.clear();
 
         /*监控窗口大小变化，及时重绘canvas*/
         window.onresize = function () {
-            /*窗口大小发生变化*/
-
-            /*移除词云*/
-            const canvasElement = document.getElementById("myCanvas");
-            if (canvasElement) {
-                const parentElement = canvasElement.parentElement;
-                if (parentElement) {
-                    parentElement.removeChild(canvasElement);
-                }
-            }
-
             /*移除遮罩*/
-            const mainElement = document.getElementById("main");
-            if (mainElement) {
-                // 移除遮罩
-                mainElement.classList.remove("mask");
-            }
-
-            /*重新创建词云*/
-            createCanvas();
+            // const mainElement = document.getElementById("main");
+            // if (mainElement) {
+            //     // 移除遮罩
+            //     mainElement.classList.remove("mask");
+            // }
 
             /*将抽奖状态归0*/
-            running = 0;
+            // running = 0;
+
+            /*重新创建词云*/
+            reCreateCanvas();
         };
     };
 
@@ -147,8 +144,8 @@
     const lottery = (count: number): any[] => {
         const resUserData = userData
             /*过滤成员，如果没有在已被抽中的名单内，则返回该元素组成新数组*/
-            .filter((m, index) => {
-                return !selectedPerson[m.name];
+            .filter((item: any) => {
+                return !selectedPerson.includes(item.name);
             })
             .map((m) => {
                 /*作为新元素*/
@@ -163,12 +160,6 @@
             })
             /*截取数组*/
             .slice(0, count);
-        // 新增被抽中的人员名单
-        // resUserData.forEach(function (m) {
-        //     choosed[m.name] = 1;
-        // });
-        // // 更新本地存储
-        // localStorage.setItem('choosed', JSON.stringify(choosed));
         return resUserData;
     };
 
@@ -176,12 +167,9 @@
         if (progress >= prizeList.length) {
             /*所有奖品抽完了，当前奖品等级0*/
             running = 0;
-
             alert("所有奖品都抽完了！");
             return;
         }
-
-        /*判断是否正在抽奖*/
 
         /*是否展示了抽奖结果*/
         if (showResult) {
@@ -215,16 +203,8 @@
                     return item.name;
                 });
                 /*重新加载人员名单*/
-                /*移除词云*/
-                const canvasElement = document.getElementById("myCanvas");
-                if (canvasElement) {
-                    const parentElement = canvasElement.parentElement;
-                    if (parentElement) {
-                        parentElement.removeChild(canvasElement);
-                    }
-                }
                 /*重新创建词云*/
-                createCanvas();
+                reCreateCanvas();
 
                 /*奖品名单记录到本地*/
                 prizeStoreMethods.setPrizeList(prizeList);
@@ -239,9 +219,8 @@
             /*进入待抽奖的状态*/
             running = 0;
 
-            progress += 1;
+            progress++; //下一个待抽奖品
             progressStoreMethods.setProgress(progress);
-            // progress++; //下一个待抽奖品
         } else {
             /*加快词云的旋转速度*/
             (window as any).TagCanvas.SetSpeed("myCanvas", [5, 1]);
@@ -299,6 +278,8 @@
         if (isConfirm) {
             prizeStoreMethods.initPrizeList();
             progressStoreMethods.initProgress();
+
+            reCreateCanvas();
         }
     };
 
@@ -391,7 +372,6 @@
                 <ul>
                     {#each prizeList as item, index}
                         <li
-                            key={index}
                             style="width: {calculateWidth(item.person?.length)}"
                         >
                             <div class="title">{item.name}</div>
@@ -514,18 +494,14 @@
         .display {
             width: 50%;
             height: 50%;
-
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            align-content: center;
-            flex-wrap: wrap;
 
             img {
                 width: 25%;
-                margin-top: 20%;
-                margin-left: 39.5%;
-                margin-right: 40.5%;
+                margin-top: 24%;
             }
 
             .down {

@@ -1,47 +1,58 @@
-# Svelte + TS + Vite
+### 项目说明：Svelte + TS + Vite 年会抽奖程序
 
-This template should help get you started developing with Svelte and TypeScript in Vite.
+#### 1. 使用的技术栈
+- **Svelte**: 一种现代的前端框架，用于构建用户界面。它在编译时将组件转换为高效的 JavaScript 代码，减少了运行时的开销。
+- **TypeScript (TS)**: 静态类型的编程语言，它是 JavaScript 的超集，提供了更强的类型检查和开发体验，有助于减少错误并提高代码质量。
+- **Vite**: 新一代的前端构建工具，具有极快的冷启动速度和热更新功能，显著提升了开发效率。
 
-## Recommended IDE Setup
+#### 2. 实现的功能
+- **抽奖系统**：实现了一个年会抽奖程序，支持多轮抽奖，每轮可以设置不同的奖品和中奖人数。
+- **动态词云展示**：使用 `TagCanvas.js` 库创建一个动态词云，展示所有参与抽奖的人员名单，并在抽奖过程中进行动画效果展示。
+- **庆祝动画**：当抽中奖品时，使用 `canvas-confetti` 库生成烟花动画，增强视觉效果。
+- **全屏切换**：提供按钮切换全屏模式，提升用户体验。
+- **结果展示**：显示每轮抽奖的结果，包括中奖者名单和奖品信息。
+- **重置功能**：允许管理员重置抽奖系统，清除所有历史记录并重新开始。
+- **重置功能**：数据存储在本地，重置后会将中奖名单清除。
 
-[VS Code](https://code.visualstudio.com/) + [Svelte](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode).
+#### 3. 安装与使用
 
-## Need an official Svelte framework?
+##### 安装依赖
+确保你已经安装了 Node.js （建议18.16.0及以上）和 npm。然后在项目根目录下执行以下命令来安装项目依赖：
 
-Check out [SvelteKit](https://github.com/sveltejs/kit#readme), which is also powered by Vite. Deploy anywhere with its serverless-first approach and adapt to various platforms, with out of the box support for TypeScript, SCSS, and Less, and easily-added support for mdsvex, GraphQL, PostCSS, Tailwind CSS, and more.
-
-## Technical considerations
-
-**Why use this over SvelteKit?**
-
-- It brings its own routing solution which might not be preferable for some users.
-- It is first and foremost a framework that just happens to use Vite under the hood, not a Vite app.
-
-This template contains as little as possible to get started with Vite + TypeScript + Svelte, while taking into account the developer experience with regards to HMR and intellisense. It demonstrates capabilities on par with the other `create-vite` templates and is a good starting point for beginners dipping their toes into a Vite + Svelte project.
-
-Should you later need the extended capabilities and extensibility provided by SvelteKit, the template has been structured similarly to SvelteKit so that it is easy to migrate.
-
-**Why `global.d.ts` instead of `compilerOptions.types` inside `jsconfig.json` or `tsconfig.json`?**
-
-Setting `compilerOptions.types` shuts out all other types not explicitly listed in the configuration. Using triple-slash references keeps the default TypeScript setting of accepting type information from the entire workspace, while also adding `svelte` and `vite/client` type information.
-
-**Why include `.vscode/extensions.json`?**
-
-Other templates indirectly recommend extensions via the README, but this file allows VS Code to prompt the user to install the recommended extension upon opening the project.
-
-**Why enable `allowJs` in the TS template?**
-
-While `allowJs: false` would indeed prevent the use of `.js` files in the project, it does not prevent the use of JavaScript syntax in `.svelte` files. In addition, it would force `checkJs: false`, bringing the worst of both worlds: not being able to guarantee the entire codebase is TypeScript, and also having worse typechecking for the existing JavaScript. In addition, there are valid use cases in which a mixed codebase may be relevant.
-
-**Why is HMR not preserving my local component state?**
-
-HMR state preservation comes with a number of gotchas! It has been disabled by default in both `svelte-hmr` and `@sveltejs/vite-plugin-svelte` due to its often surprising behavior. You can read the details [here](https://github.com/rixo/svelte-hmr#svelte-hmr).
-
-If you have state that's important to retain within a component, consider creating an external store which would not be replaced by HMR.
-
-```ts
-// store.ts
-// An extremely simple external store
-import { writable } from 'svelte/store'
-export default writable(0)
+```bash
+npm install
 ```
+
+##### 启动开发服务器
+安装完成后，可以通过以下命令启动开发服务器：
+
+```bash
+npm run dev
+```
+
+这将启动 Vite 开发服务器，默认情况下会在 `http://localhost:5173` 上运行。
+
+##### 构建生产版本
+当你准备好部署项目时，可以使用以下命令构建生产版本：
+
+```bash
+npm run build
+```
+
+构建后的文件将位于 `dist` 目录中，可以直接部署到你的 Web 服务器上。
+
+
+#### 4. 项目结构简要说明
+- **src/**: 源代码目录，包含 Svelte 组件、样式文件和其他资源。
+- **public/**: 静态资源目录，如图片、字体等。
+- **store/**: 存储管理模块，用于管理应用状态。
+- **assets/**: 静态资源文件夹，包含 CSS、图片等资源。
+- **README.md**: 项目说明文档。
+
+#### 5. 注意事项
+- 确保在使用前备份好数据，尤其是使用重置功能时。
+- 如果需要修改奖品列表或参与人员名单，请编辑相应的 JSON 文件（如 `member.json`）。
+
+通过以上步骤，你可以轻松地安装和使用这个年会抽奖程序。希望这个项目能为你的年会增添更多的乐趣和互动！
+
+说明：灵感来自 [friend-nicen](https://github.com/friend-nicen/lottery)

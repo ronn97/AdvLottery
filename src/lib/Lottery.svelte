@@ -2,7 +2,7 @@
     import { onMount, onDestroy } from "svelte";
     import "@/assets/js/tagcanvas.js";
     import confetti from "canvas-confetti";
-    import { member } from "@/assets/js/member.js";
+    // import { member } from "js/member.js";
     import {
         prizeListStore,
         selectedPersonStore,
@@ -104,28 +104,6 @@
             return "25%";
         }
         return `${person * 15}%`;
-    };
-
-    const buildData = () => {
-        member.forEach((item: any, index: number) => {
-            userData.push({ name: item, index: index });
-        });
-
-        /*监控窗口大小变化，及时重绘canvas*/
-        window.onresize = function () {
-            /*移除遮罩*/
-            // const mainElement = document.getElementById("main");
-            // if (mainElement) {
-            //     // 移除遮罩
-            //     mainElement.classList.remove("mask");
-            // }
-
-            /*将抽奖状态归0*/
-            // running = 0;
-
-            /*重新创建词云*/
-            reCreateCanvas();
-        };
     };
 
     const removeMask = () => {
@@ -286,7 +264,7 @@
         const isConfirm = confirm("确定要重置么？所有之前的抽奖历史将被清除！");
         if (isConfirm) {
             running = 0;
-            
+
             prizeStoreMethods.initPrizeList();
             progressStoreMethods.initProgress();
 
@@ -351,7 +329,34 @@
         });
     };
 
-    onMount(() => {
+    const getData = async () => {
+        try {
+            const response = await fetch("member.json");
+            if (!response.ok) {
+                throw new Error("Network response was not ok");
+            }
+            const data = await response.json();
+            data?.member?.forEach((item: any, index: number) => {
+                userData.push({ name: item, index: index });
+            });
+        } catch (error) {
+            console.error(
+                "There has been a problem with your fetch operation:",
+                error,
+            );
+        }
+    };
+
+    const buildCanvas = async () => {
+        createCanvas();
+        /*监控窗口大小变化，及时重绘canvas*/
+        window.onresize = function () {
+            /*重新创建词云*/
+            reCreateCanvas();
+        };
+    };
+
+    onMount(async () => {
         prizeListStore.subscribe((value: any) => {
             prizeList = value;
             console.log("Updated prizeList:", prizeList); // 调试信息
@@ -365,8 +370,8 @@
             console.log("Updated progress:", progress);
         });
 
-        buildData();
-        createCanvas();
+        await getData();
+        await buildCanvas();
     });
 
     onDestroy(() => {
@@ -482,6 +487,18 @@
             align-items: center;
             justify-content: center;
         }
+    }
+
+    /*画布滤镜用于模糊显示*/
+    .mask {
+        -webkit-filter: blur(5px);
+        filter: blur(5px);
+    }
+
+    /*过渡效果*/
+    #main {
+        -webkit-transition: all 1s;
+        transition: all 1s;
     }
 
     .wall {

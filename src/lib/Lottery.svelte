@@ -1,6 +1,7 @@
 <script lang="ts">
     import { onMount, onDestroy } from "svelte";
     import "@/assets/js/tagcanvas.js";
+    import confetti from "canvas-confetti";
     import { member } from "@/assets/js/member.js";
     import {
         prizeListStore,
@@ -202,6 +203,8 @@
                 prizeList[progress].person = ret.map((item: any) => {
                     return item.name;
                 });
+
+                confettiFire();
                 /*重新加载人员名单*/
                 /*重新创建词云*/
                 reCreateCanvas();
@@ -285,6 +288,63 @@
         }
     };
 
+    // 庆祝动画
+    const confettiFire = () => {
+        const duration = 3 * 1000;
+        const end = Date.now() + duration;
+        (function frame() {
+            // launch a few confetti from the left edge
+            confetti({
+                particleCount: 2,
+                angle: 60,
+                spread: 55,
+                origin: { x: 0 },
+            });
+            // and launch a few from the right edge
+            confetti({
+                particleCount: 2,
+                angle: 120,
+                spread: 55,
+                origin: { x: 1 },
+            });
+
+            // keep going until we are out of time
+            if (Date.now() < end) {
+                requestAnimationFrame(frame);
+            }
+        })();
+        centerFire(0.25, {
+            spread: 26,
+            startVelocity: 55,
+        });
+        centerFire(0.2, {
+            spread: 60,
+        });
+        centerFire(0.35, {
+            spread: 100,
+            decay: 0.91,
+            scalar: 0.8,
+        });
+        centerFire(0.1, {
+            spread: 120,
+            startVelocity: 25,
+            decay: 0.92,
+            scalar: 1.2,
+        });
+        centerFire(0.1, {
+            spread: 120,
+            startVelocity: 45,
+        });
+    };
+    const centerFire = (particleRatio: number, opts: any) => {
+        const count = 200;
+        confetti({
+            origin: { y: 0.7 },
+            ...opts,
+            particleCount: Math.floor(count * particleRatio),
+        });
+    };
+
     onMount(() => {
         prizeListStore.subscribe((value: any) => {
             prizeList = value;
@@ -356,18 +416,20 @@
                 <div class="display">
                     <!--输出抽奖结果-->
                     <img
-                        src={prizeList[progress-1].url}
-                        alt={prizeList[progress-1].label +
+                        src={prizeList[progress - 1].url}
+                        alt={prizeList[progress - 1].label +
                             " " +
-                            prizeList[progress-1].name}
+                            prizeList[progress - 1].name}
                     />
                     <div class="down">
                         <div class="item1">
-                            {prizeList[progress-1].label +
+                            {prizeList[progress - 1].label +
                                 " " +
-                                prizeList[progress-1].name}
+                                prizeList[progress - 1].name}
                         </div>
-                        <div class="item2">{prizeList[progress-1].person}</div>
+                        <div class="item2">
+                            {prizeList[progress - 1].person}
+                        </div>
                     </div>
                 </div>
             {/if}

@@ -106,20 +106,6 @@
         return `${person * 15}%`;
     };
 
-    const removeMask = () => {
-        const mainElement = document.getElementById("main");
-        if (mainElement) {
-            mainElement.classList.remove("mask");
-        }
-    };
-
-    const addMask = () => {
-        const mainElement = document.getElementById("main");
-        if (mainElement) {
-            mainElement.classList.add("mask");
-        }
-    };
-
     const lottery = (count: number): any[] => {
         const resUserData = userData
             /*过滤成员，如果没有在已被抽中的名单内，则返回该元素组成新数组*/
@@ -155,8 +141,6 @@
             showResult = !showResult;
             /*进入待抽奖的状态*/
             running = 0;
-
-            removeMask();
             return;
         }
 
@@ -176,7 +160,6 @@
                 running = 0;
                 return;
             } else {
-                addMask();
                 /*中奖信息*/
                 prizeList[progress].person = ret.map((item: any) => {
                     return item.name;
@@ -198,8 +181,6 @@
             /*进入中奖结果公式状态*/
         } else if (running == 2) {
             // 中奖结果公式状态
-            /*隐藏滤镜*/
-            removeMask();
 
             /*进入待抽奖的状态*/
             running = 0;
@@ -240,12 +221,6 @@
 
         /*进入待抽奖的状态*/
         running = 0;
-
-        if (showResult) {
-            removeMask();
-        } else {
-            addMask();
-        }
 
         /*改变显示的状态*/
         showResult = !showResult;
@@ -387,7 +362,7 @@
     {/if}
 </header>
 <div class="bodyBox">
-    <div class="wall" id="main"></div>
+    <div class="wall" class:mask={running === 2} id="main"></div>
 
     <!--显示右下角的工具按钮-->
     <div class="tools">

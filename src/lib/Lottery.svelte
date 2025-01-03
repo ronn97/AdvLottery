@@ -274,13 +274,19 @@
     };
 
     const handleOfReset = () => {
-        /*如果不是待抽奖状态*/
-        if (running != 0) {
+        /*如果正在抽奖*/
+        if (running == 1) {
             return;
         }
+        // /*如果不是待抽奖状态*/
+        // if (running != 0) {
+        //     return;
+        // }
 
         const isConfirm = confirm("确定要重置么？所有之前的抽奖历史将被清除！");
         if (isConfirm) {
+            running = 0;
+            
             prizeStoreMethods.initPrizeList();
             progressStoreMethods.initProgress();
 

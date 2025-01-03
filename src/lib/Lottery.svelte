@@ -208,19 +208,23 @@
 
                 /*奖品名单记录到本地*/
                 prizeStoreMethods.setPrizeList(prizeList);
+
+                progress++; //下一个待抽奖品
+                progressStoreMethods.setProgress(progress);
             }
 
             running = 2;
             /*进入中奖结果公式状态*/
         } else if (running == 2) {
+            // 中奖结果公式状态
             /*隐藏滤镜*/
             removeMask();
 
             /*进入待抽奖的状态*/
             running = 0;
 
-            progress++; //下一个待抽奖品
-            progressStoreMethods.setProgress(progress);
+            // progress++; //下一个待抽奖品
+            // progressStoreMethods.setProgress(progress);
         } else {
             /*加快词云的旋转速度*/
             (window as any).TagCanvas.SetSpeed("myCanvas", [5, 1]);
@@ -264,8 +268,6 @@
 
         /*改变显示的状态*/
         showResult = !showResult;
-
-        console.log("showResult", showResult);
     };
 
     const handleOfReset = () => {
@@ -354,18 +356,18 @@
                 <div class="display">
                     <!--输出抽奖结果-->
                     <img
-                        src={prizeList[progress].url}
-                        alt={prizeList[progress].label +
+                        src={prizeList[progress-1].url}
+                        alt={prizeList[progress-1].label +
                             " " +
-                            prizeList[progress].name}
+                            prizeList[progress-1].name}
                     />
                     <div class="down">
                         <div class="item1">
-                            {prizeList[progress].label +
+                            {prizeList[progress-1].label +
                                 " " +
-                                prizeList[progress].name}
+                                prizeList[progress-1].name}
                         </div>
-                        <div class="item2">{prizeList[progress].person}</div>
+                        <div class="item2">{prizeList[progress-1].person}</div>
                     </div>
                 </div>
             {/if}

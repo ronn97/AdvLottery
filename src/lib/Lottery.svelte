@@ -436,13 +436,18 @@
                 <!--循环输出结果-->
                 <ul>
                     {#each prizeList as item, index}
-                        <li
+                        <!-- <li
                             style="width: {calculateWidth(item.person?.length)}"
-                        >
+                        > -->
+                        <li>
                             <div class="title">{item.name}</div>
                             <img src={item.url} alt={item.name} />
                             <div class="footer">
-                                {item.person?.length ? item.person : item.label}
+                                <p>
+                                    {item.person?.length
+                                        ? item.person
+                                        : item.label}
+                                </p>
                             </div>
                         </li>
                     {/each}
@@ -646,6 +651,9 @@
                     background-image: url("@/assets/img/bg.png");
                     background-size: 100% 100%;
                     text-align: center;
+                    width: 200px;
+                    padding-bottom: 30px;
+                    position: relative;
 
                     img {
                         //width: 50%;
@@ -666,9 +674,44 @@
                         margin-bottom: 0;
                         background-size: 100% 100%;
                         color: #ffffff;
-                        font-size: 25px;
+                        font-size: 18px;
                         padding: 3px;
                     }
+
+                    .footer {
+                        position: absolute;
+                        top: 212px;
+                        padding: 3px 20px;
+                        background: linear-gradient(0deg, #b00b0b, #f73109);
+                        border-radius: 5px;
+                    }
+
+                    // //根据自己情况调节，
+                    // @keyframes scrollCarousel {
+                    //     0% {
+                    //         transform: translateX(0px);
+                    //         -webkit-transform: translateX(0px);
+                    //     }
+                    //     100% {
+                    //         transform: translateX(-100%);
+                    //         -webkit-transform: translateX(-100%);
+                    //     }
+                    // }
+
+                    // .footer {
+                    //     width: 150px;
+                    //     overflow: hidden;
+                    //     p {
+                    //         display: inline-block;
+                    //         white-space: nowrap;
+                    //         animation: 10s scrollCarousel linear infinite normal;
+
+                    //         &:hover {
+                    //             animation: 10s scrollCarousel linear infinite
+                    //                 normal paused;
+                    //         }
+                    //     }
+                    // }
                 }
             }
         }

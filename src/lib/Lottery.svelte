@@ -74,8 +74,10 @@
                     {
                         textColour: "#FFD700",
                         initial: speed(),
-                        textHeight: 42,
+                        textHeight: 22,
                         zoom: 1.05,
+                        txtScale: 3,
+                        maxSpeed: 0.02,
                         dragControl: true,
                     },
                 );
@@ -356,7 +358,13 @@
 
 <header>
     {#if running == 1}
-        <div class="boxWrap">{"正在抽取-" + prizeList[progress].label}</div>
+        <div class="boxWrap">
+            {"正在抽取 - " +
+                prizeList[progress].label +
+                " - " +
+                prizeList[progress].number +
+                "个"}
+        </div>
     {:else}
         <div class="boxWrap">上海灵擎网络-抽奖系统</div>
     {/if}

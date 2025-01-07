@@ -12,4 +12,9 @@ export default defineConfig({
     },
   },
   plugins: [svelte()],
+  server: {
+    host: '0.0.0.0', //设置0.0.0.0和true 就是监听所有
+    port: 5173,
+    open: true
+  }
 })

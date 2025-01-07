@@ -11,17 +11,31 @@ interface PrizeState {
 const initialState: PrizeState[] = [
     {
         name: "TBox 茶合",
-        label: "三等奖",
+        label: "四等奖",
         url: "img/prize/a11.png",
         person: [],
-        number: 10,
+        number: 5,
     },
     {
         name: "美的电饭煲",
-        label: "二等奖",
+        label: "三等奖",
         url: "img/prize/a10.png",
         person: [],
+        number: 3,
+    },
+     {
+        name: "拍立得",
+        label: "二等奖",
+        url: "img/prize/a4.png",
+        person: [],
         number: 2,
+    },
+    {
+        name: "iPhone 16",
+        label: "一等奖",
+        url: "img/prize/a1.png",
+        person: [],
+        number: 1,
     }
 ];
 
